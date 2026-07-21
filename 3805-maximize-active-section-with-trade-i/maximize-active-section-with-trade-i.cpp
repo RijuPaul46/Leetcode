@@ -2,51 +2,45 @@ class Solution {
 public:
     int maxActiveSectionsAfterTrade(string s) {
         int n=s.size();
-        vector<pair<int,int>> arr;
-        int one=0,zero=0;
-        if(s[0]=='1')one++;
-        else{
-            zero++;
-        }
-        for(int i=1;i<n;i++){
-            if(s[i]=='1'){
-                one++;
-                if(zero!=0){
-                    arr.push_back({zero,0});
-                    zero=0;
-                }
+        vector<int>left(n);
+        vector<int>right(n);
+        int zero=0;
+        int one=0;
+        for(int i=0;i<n;i++){
+            if(s[i]=='0'){
+                zero++;
             }
             else{
+                one++;
+                left[i]=zero;
+                zero=0;
+            }
+        }
+        zero=0;
+        for(int i=n-1;i>=0;i--){
+            if(s[i]=='0'){
                 zero++;
-                if(one!=0){
-                    arr.push_back({one,1});
-                    one=0;
-                }
+            }
+            else {
+                right[i]=zero;
+                zero=0;
             }
         }
-        if(one!=0){
-            arr.push_back({one,1});
-            one=0;
-        }
-        if(zero!=0){
-            arr.push_back({zero,0});
-            zero=0;
-        }
-        int len=arr.size();
+        int si=-1;
+        int ei=-1;
         int ans=0;
-        int total_one=0;
-        for(int i=0;i<len;i++){
-            int num=arr[i].first;
-            int type=arr[i].second;
-            if(type==1){
-                total_one+=num;
-                if(i!=0 && i!=len-1){
-                    int x=arr[i-1].first+arr[i+1].first;
-                    ans=max(ans,x);   
-                }
+        for(int i=0;i<n;i++){
+            if(s[i]=='1'){
+                si=i;
+                ei=i;
+                while(ei+1<n && s[ei+1]!='0')ei++;
+                int l=left[si];
+                int r=right[ei];
+                int one=ei-si+1;
+                if(l>0 && r>0) ans=max(ans,l+r);
+                i=ei;
             }
-
         }
-        return ans+total_one;
+        return ans+one;
     }
 };
