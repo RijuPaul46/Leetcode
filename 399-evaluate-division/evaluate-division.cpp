@@ -1,54 +1,60 @@
-class Node{
-    public:
-    string str;
-    unordered_map<Node*,double> mp;
-    Node(string s){
-        str=s;
-    }
-};
+
+#define db double
 class Solution {
 public:
-    double dfs(Node* src,Node* target,double product,unordered_set<Node*> &visited){
-        if(src==target)return product;
-        for(auto const &[node,val]:src->mp){
-            if(visited.count(node)==0){
-                double ans=-1;
-                visited.insert(node);
-                ans=dfs(node,target,product*val,visited);
-                if(ans!=-1)return ans;
+    bool dfs(int node,int tgt,db &prdt,vector<vector<pair<db,db>>> &adj,vector<bool>&visited){
+        if(node==tgt){
+            return 1;
+        }
+        visited[node]=true;
+        for(auto &[v,w]:adj[node]){
+            if(!visited[v]){
+                prdt*=w;
+                bool ans=dfs(v,tgt,prdt,adj,visited);
+                if(ans)return true;
+                prdt/=w;
             }
         }
-        return -1;
+        visited[node]=false;
+        return false;
     }
-
-    vector<double> calcEquation(vector<vector<string>>& equations, vector<double>& values, vector<vector<string>>& queries) {
-        unordered_map<string,Node*> mp;
-        int n=values.size();
+    vector<double> calcEquation(vector<vector<string>>& eq, vector<double>& val, vector<vector<string>>& qr) {
+        unordered_map<string,int>mp;
+        int n=eq.size();
+        vector<vector<pair<db,db>>> adj(2*n);
+        int cnt=0;
         for(int i=0;i<n;i++){
-            double val=values[i];
-            string a=equations[i][0];
-            string b=equations[i][1];
-            if(!mp.count(a)){
-                Node* node=new Node(a);
-                mp[a]=node;
-            }
-            if(!mp.count(b)){
-                Node* node=new Node(b);
-                mp[b]=node;
-            }
-            mp[a]->mp[mp[b]]=val;
-            mp[b]->mp[mp[a]]=1/val;
+            auto e=eq[i];
+            string a=e[0];
+            string b=e[1];
+            if(!mp.count(a))
+            mp[a]=cnt++;
+            if(!mp.count(b))
+            mp[b]=cnt++;
+            int u=mp[a];
+            int v=mp[b];
+            adj[u].push_back(make_pair(v,val[i]));
+            adj[v].push_back(make_pair(u,(db)1/val[i]));
         }
-        int q=queries.size();
-        vector<double> ans(q,-1);
+        int q=qr.size();
+        vector<db> ans(q);
         for(int i=0;i<q;i++){
-            string c=queries[i][0];
-            string d=queries[i][1];
-            if(mp.count(c) && mp.count(d) ){
-                unordered_set<Node*> visited;
-                ans[i]=dfs(mp[c],mp[d],1,visited);
+            if(mp.count(qr[i][0]) && mp.count(qr[i][1])){
+            int src=mp[qr[i][0]];
+            int dst=mp[qr[i][1]];
+            
+                vector<bool> visited(2*n,false);
+                db prdt=1;
+                bool found=dfs(src,dst,prdt,adj,visited);
+                if(found)ans[i]=prdt;
+                else ans[i]=-1.0;
+
+            
             }
+            else ans[i]=-1.0;
+
         }
         return ans;
+
     }
 };
