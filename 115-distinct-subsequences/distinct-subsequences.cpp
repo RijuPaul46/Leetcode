@@ -1,22 +1,23 @@
-int dp[1001][1001];
 class Solution {
 public:
-    int solve(int i,int j,string &s, string &t){
-        int n1=s.size();
-        int n2=t.size();
+    int solve(int i,int j,string &s,string &t,vector<vector<int>> &dp){
+        int n=s.size();
+        int m=t.size();
+        if(j==m)return 1;
+        if(i==n)return 0;
         auto &ref=dp[i][j];
         if(ref!=-1)return ref;
-        if(j>=n2)return 1;
-        if(i>=n1)return 0;
-        int ans=0;
-        if(s[i]==t[j]){
-            ans+=solve(i+1,j+1,s,t);
+        if(s[i]!=t[j]){
+            return ref=solve(i+1,j,s,t,dp);
         }
-        ans+=solve(i+1,j,s,t);
-        return ref=ans;
+        int take=solve(i+1,j+1,s,t,dp);
+        int skip=solve(i+1,j,s,t,dp);
+        return ref=take+skip;
     }
     int numDistinct(string s, string t) {
-        memset(dp,-1,sizeof(dp));
-        return solve(0,0,s,t); 
+        int n=s.size();
+        int m=t.size();
+        vector<vector<int>> dp(n,vector<int>(m,-1));
+        return solve(0,0,s,t,dp);
     }
 };
