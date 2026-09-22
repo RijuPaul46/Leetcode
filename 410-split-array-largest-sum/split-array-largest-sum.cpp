@@ -1,34 +1,34 @@
-#include <bits/stdc++.h>
 class Solution {
 public:
-    int dp[1001][51];
-    int solve(int idx,vector<int>& nums, int k,vector<int>&pre){
+    // we can sense bs .... let x be the min answer 
+    // we can easily make >x sum within k split
+    bool check(vector<int>&nums,int k,int x){
         int n=nums.size();
-        if(k==0){
-            int a= pre[n-1];
-            if(idx-1>=0)a-=pre[idx-1];
-            return a;
+        int mx=*max_element(nums.begin(),nums.end());
+        if(mx>x)return false;
+        int sm=0;
+        int cnt=0;
+        for(int i=0;i<n;i++){
+           if((sm+nums[i])>x){
+                cnt++;
+                sm=nums[i];  
+           }
+           else sm+=nums[i];
         }
-        if(idx>=n-1)return INT_MAX;
-        auto &ref=dp[idx][k];
-        if(ref!=-1)return ref;
-        int sm=INT_MAX;
-        int sum=0;
-        for(int i=idx;i<n;i++){
-            sum+=nums[i];
-            sm=min(sm,max(sum,solve(i+1,nums,k-1,pre)));
-            
-        }
-        return ref=sm;
-
-
+        return cnt<=k;
     }
     int splitArray(vector<int>& nums, int k) {
-        int n=nums.size();
-        vector<int>pre(n);
-        pre[0]=nums[0];
-        for(int i=1;i<n;i++)pre[i]=pre[i-1]+nums[i];
-        memset(dp,-1,sizeof(dp));
-        return solve(0,nums,k-1,pre);
+        int l=*max_element(nums.begin(),nums.end());
+        int h=1e9;
+        int ans=0;
+        while(l<=h){
+            int mid=l+(h-l)/2;
+            if(check(nums,k-1,mid)){
+                ans=mid;
+                h=mid-1;
+            }
+            else l=mid+1;
+        }
+        return ans;
     }
 };
