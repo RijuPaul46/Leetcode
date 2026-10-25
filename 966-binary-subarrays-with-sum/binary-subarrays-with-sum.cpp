@@ -1,35 +1,27 @@
 class Solution {
 public:
-    //for each index record next 1 is where 
-    int numSubarraysWithSum(vector<int>& nums, int goal) {
+    // by two pointer approach we can easily calculate number of subarray having sum<=x easily ... because we shrink the left pointer untill the sum>goal ... so we stop at the largest subarray having sum=goal so all inside subarray will have sum<=goal ...and for our answer we can do 
+    // no of subarray with sum<=goal - no of subarray with sum<=goal-1 
+    int subarray(vector<int>&nums,int goal){
         int n=nums.size();
-        vector<int>nxt(n,n);
-        vector<int>st;
-        for(int i=0;i<n;i++){
-            if(nums[i]==0)st.push_back(i);
-            else{
-                while(!st.empty()){
-                    nxt[st.back()]=i;
-                    st.pop_back();
-                }
-            }
-
-        }
         int l=0;
-        int cnt=0,sm=0;
+        int sm=0;
+        int cnt=0;
         for(int r=0;r<n;r++){
             sm+=nums[r];
-            while(sm>goal && l<r){
+            while(sm > goal && l<r){
                 sm-=nums[l++];
             }
-            if(sm==goal){
-                if(nums[l]==0){
-                int next=min(r,nxt[l]);
-                cnt+=(next-l+1);
-                }
-                else cnt++;
-            }
+            if(sm <=goal)
+            cnt+=(r-l+1);
         }
         return cnt;
+    }
+    int numSubarraysWithSum(vector<int>& nums, int goal) {
+        int a=subarray(nums,goal);
+        int b=0;
+        if((goal-1) >=0)
+        b=subarray(nums,goal-1);
+        return a-b;
     }
 };
