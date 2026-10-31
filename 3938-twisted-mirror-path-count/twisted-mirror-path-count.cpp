@@ -9,14 +9,15 @@ public:
         if(r<0 || r>=m || c<0 || c>=n)return 0;
         auto &ref=dp[r][c][prev];
         if(ref!=-1)return ref;
-        ll right=solve(r,c+1,grid,dp,1);
-        ll down=solve(r+1,c,grid,dp,0);
+        
         if(grid[r][c]==1){
             if(prev==0){
-                return ref=right;
+                return ref=solve(r,c+1,grid,dp,1);
             }
-            return ref=down;
+            return ref=solve(r+1,c,grid,dp,0);
         }
+        ll right=solve(r,c+1,grid,dp,1);
+        ll down=solve(r+1,c,grid,dp,0);
         return ref=(1ll* right+down)%mod;
         
 
